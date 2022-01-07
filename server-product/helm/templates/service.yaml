@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "onedev.fullname" . }}
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: onedev
+spec:
+  {{- if not .Values.ingress.host }}
+  type: LoadBalancer
+  {{- end }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: 6610
+      protocol: TCP
+    - name: ssh
+      port: 22
+      targetPort: 6611
+      protocol: TCP
+  selector:
+    {{- include "onedev.selectorLabels" . | nindent 4 }}
+    tier: onedev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "onedev.fullname" . }}-mysql
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    {{- include "onedev.selectorLabels" . | nindent 4 }}
+    tier: mysql
